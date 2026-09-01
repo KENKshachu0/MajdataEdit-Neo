@@ -24,6 +24,7 @@ fi
 DOTNET="${DOTNET:-dotnet}"
 SELF_CONTAINED="${SELF_CONTAINED:-false}"
 USE_EXISTING_BUILD="${USE_EXISTING_BUILD:-false}"
+BUNDLE_DOTNET="${BUNDLE_DOTNET:-false}"
 PUBLISH_DIR="$ROOT_DIR/artifacts/publish/$RID"
 APP_DIR="$ROOT_DIR/artifacts/MajdataEdit-Neo-$RID.app"
 
@@ -54,6 +55,30 @@ else
 fi
 
 cp -R "$PUBLISH_DIR"/. "$APP_DIR/Contents/MacOS/"
+
+if [[ "$BUNDLE_DOTNET" == "true" ]]; then
+  # A framework-dependent apphost only searches system locations when started
+  # by Finder. Bundle the runtime and use a relative launcher so the .app can
+  # be opened without a separate .NET installation.
+  DOTNET_ROOT_DIR="${DOTNET_ROOT:-}"
+  if [[ -z "$DOTNET_ROOT_DIR" || ! -x "$DOTNET_ROOT_DIR/dotnet" ]]; then
+    echo "BUNDLE_DOTNET=true requires DOTNET_ROOT to point to a .NET installation." >&2
+    exit 5
+  fi
+  mkdir -p "$APP_DIR/Contents/MacOS/dotnet-root"
+  cp -R "$DOTNET_ROOT_DIR/host" "$APP_DIR/Contents/MacOS/dotnet-root/"
+  cp -R "$DOTNET_ROOT_DIR/shared" "$APP_DIR/Contents/MacOS/dotnet-root/"
+  cp "$DOTNET_ROOT_DIR/dotnet" "$APP_DIR/Contents/MacOS/dotnet-root/dotnet"
+  mv "$APP_DIR/Contents/MacOS/MajdataEdit-Neo" "$APP_DIR/Contents/MacOS/MajdataEdit-Neo.bin"
+  cat > "$APP_DIR/Contents/MacOS/MajdataEdit-Neo" <<'LAUNCHER'
+#!/bin/sh
+set -eu
+HERE="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+export DOTNET_ROOT="$HERE/dotnet-root"
+exec "$HERE/MajdataEdit-Neo.bin" "$@"
+LAUNCHER
+  chmod +x "$APP_DIR/Contents/MacOS/MajdataEdit-Neo"
+fi
 
 cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>

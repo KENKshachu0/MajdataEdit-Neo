@@ -51,6 +51,14 @@ runtime pack is not available locally, reuse that output without downloading:
 USE_EXISTING_BUILD=true ./scripts/publish-macos.sh osx-arm64
 ```
 
+To make a self-contained app that does not require a system .NET install,
+provide `DOTNET_ROOT` and bundle the installed runtime:
+
+```bash
+DOTNET_ROOT=/path/to/dotnet BUNDLE_DOTNET=true \
+  USE_EXISTING_BUILD=true ./scripts/publish-macos.sh osx-arm64
+```
+
 The script defaults to framework-dependent publishing. Set
 `SELF_CONTAINED=true` for a standalone bundle on a normal macOS/.NET setup;
 that mode downloads the matching .NET runtime pack.
