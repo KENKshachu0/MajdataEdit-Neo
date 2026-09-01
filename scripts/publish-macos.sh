@@ -23,27 +23,35 @@ fi
 
 DOTNET="${DOTNET:-dotnet}"
 SELF_CONTAINED="${SELF_CONTAINED:-false}"
+USE_EXISTING_BUILD="${USE_EXISTING_BUILD:-false}"
 PUBLISH_DIR="$ROOT_DIR/artifacts/publish/$RID"
 APP_DIR="$ROOT_DIR/artifacts/MajdataEdit-Neo-$RID.app"
 
 rm -rf "$PUBLISH_DIR" "$APP_DIR"
 mkdir -p "$PUBLISH_DIR" "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
 
-PUBLISH_ARGS=(
-  publish "$ROOT_DIR/MajdataEdit-Neo.csproj"
-  --configuration Release
-  --runtime "$RID"
-  --self-contained "$SELF_CONTAINED"
-  --output "$PUBLISH_DIR"
-)
+if [[ "$USE_EXISTING_BUILD" == "true" ]]; then
+  EXISTING_BUILD_DIR="$ROOT_DIR/bin/Release/net9.0"
+  if [[ ! -f "$EXISTING_BUILD_DIR/MajdataEdit-Neo" ]]; then
+    echo "Missing existing build at $EXISTING_BUILD_DIR. Run dotnet build first." >&2
+    exit 4
+  fi
+  cp -R "$EXISTING_BUILD_DIR"/. "$PUBLISH_DIR"/
+else
+  PUBLISH_ARGS=(
+    publish "$ROOT_DIR/MajdataEdit-Neo.csproj"
+    --configuration Release
+    --runtime "$RID"
+    --self-contained "$SELF_CONTAINED"
+    --output "$PUBLISH_DIR"
+  )
 
-if [[ "$SELF_CONTAINED" != "true" ]]; then
-  # Framework-dependent publishing uses the already-restored net9.0 assets and
-  # avoids downloading a platform runtime pack during local development.
-  PUBLISH_ARGS+=(--no-restore)
+  if [[ "$SELF_CONTAINED" != "true" ]]; then
+    PUBLISH_ARGS+=(--no-restore)
+  fi
+
+  "$DOTNET" "${PUBLISH_ARGS[@]}"
 fi
-
-"$DOTNET" "${PUBLISH_ARGS[@]}"
 
 cp -R "$PUBLISH_DIR"/. "$APP_DIR/Contents/MacOS/"
 

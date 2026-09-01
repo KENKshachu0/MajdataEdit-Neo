@@ -40,6 +40,13 @@ bundle. It requires `libbass.dylib` beside the project file and accepts either
 open artifacts/MajdataEdit-Neo-osx-arm64.app
 ```
 
+If the project has already been built with `dotnet build` and the matching
+runtime pack is not available locally, reuse that output without downloading:
+
+```bash
+USE_EXISTING_BUILD=true ./scripts/publish-macos.sh osx-arm64
+```
+
 The script defaults to framework-dependent publishing. Set
 `SELF_CONTAINED=true` for a standalone bundle on a normal macOS/.NET setup;
 that mode downloads the matching .NET runtime pack.
