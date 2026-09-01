@@ -31,6 +31,19 @@ The current project is a desktop .NET output, not yet a signed/notarized
 `.app` bundle. Code signing and packaging are required before distributing it
 outside a development machine.
 
+The repository includes `scripts/publish-macos.sh` to create a local app
+bundle. It requires `libbass.dylib` beside the project file and accepts either
+`osx-arm64` or `osx-x64`:
+
+```bash
+./scripts/publish-macos.sh osx-arm64
+open artifacts/MajdataEdit-Neo-osx-arm64.app
+```
+
+The script defaults to framework-dependent publishing. Set
+`SELF_CONTAINED=true` for a standalone bundle on a normal macOS/.NET setup;
+that mode downloads the matching .NET runtime pack.
+
 ## MajdataPlay connection
 
 The editor connects to MajdataPlay through:
