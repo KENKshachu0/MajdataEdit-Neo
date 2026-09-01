@@ -46,8 +46,8 @@ class TrackReader : IDisposable
     int bgmStream =0;
     public TrackInfo ReadTrack (string dirpath)
     {
-        var useOgg = File.Exists(dirpath + "/track.ogg");
-        var filePath = dirpath + "/track" + (useOgg ? ".ogg" : ".mp3");
+        var useOgg = File.Exists(Path.Combine(dirpath, "track.ogg"));
+        var filePath = Path.Combine(dirpath, "track" + (useOgg ? ".ogg" : ".mp3"));
         if(bgmStream is not 0)
         Bass.StreamFree(bgmStream);
         var bgmDecode = Bass.CreateStream(filePath, 0L, 0L, BassFlags.Decode);

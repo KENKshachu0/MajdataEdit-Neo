@@ -13,10 +13,17 @@ namespace MajdataEdit_Neo.Modules.AutoSave;
 /// </summary>
 internal sealed class SafeTerminationDetector
 {
-    public readonly string RecordPath = Environment.CurrentDirectory + "/PROGRAM_RUNNING";
+    private static readonly string AppDataDirectory = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "MajdataEdit-Neo");
+
+    // The app bundle and /Applications are not writable on macOS. Keep the
+    // crash marker in the per-user application-data directory instead.
+    public readonly string RecordPath = Path.Combine(AppDataDirectory, "PROGRAM_RUNNING");
 
     private SafeTerminationDetector()
     {
+        Directory.CreateDirectory(AppDataDirectory);
     }
 
     /// <summary>

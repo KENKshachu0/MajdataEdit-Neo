@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <!-- Keep the project portable; WinExe is a Windows-specific subsystem. -->
+    <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
 	  <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- The application manifest is only meaningful on Windows. -->
+    <ApplicationManifest Condition="$([MSBuild]::IsOSPlatform('Windows'))">app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
@@ -48,7 +50,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="bass.dll">
+    <None Update="bass.dll" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <!-- Download the matching BASS native library for macOS (arm64/x64) separately. -->
+    <None Update="libbass.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="simai.tmLanguage.json">

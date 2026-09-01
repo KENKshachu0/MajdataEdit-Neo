@@ -788,7 +788,9 @@ public partial class MainWindowViewModel : ViewModelBase
     }
     class InternalAutoSaveContext : IAutoSaveContext, IAutoSaveContentProvider<string>
     {
-        public string WorkingPath { get; set; } = Path.Combine(Environment.CurrentDirectory, ".autosave");
+        public string WorkingPath { get; set; } = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "MajdataEdit-Neo", ".autosave");
         public string RawFilePath { get; set; } = string.Empty;
         public string Content => _contentProvider?.Content ?? string.Empty;
 
