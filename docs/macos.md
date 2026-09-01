@@ -31,6 +31,10 @@ The current project is a desktop .NET output, not yet a signed/notarized
 `.app` bundle. Code signing and packaging are required before distributing it
 outside a development machine.
 
+The framework-dependent app requires the macOS .NET 9 runtime
+(`Microsoft.NETCore.App 9.0.x`). macOS does not provide a separate
+`.NET Desktop Runtime` package; install the standard .NET runtime or SDK.
+
 The repository includes `scripts/publish-macos.sh` to create a local app
 bundle. It requires `libbass.dylib` beside the project file and accepts either
 `osx-arm64` or `osx-x64`:
