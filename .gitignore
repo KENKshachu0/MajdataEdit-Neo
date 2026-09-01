@@ -397,3 +397,8 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /.autosave
+
+# BASS native library is downloaded separately from Un4seen and must not be
+# committed to the repository. Place libbass.dylib beside the project file
+# when building on macOS.
+libbass.dylib
